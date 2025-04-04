@@ -1,8 +1,8 @@
-version: '3.8'  # Ou uma versão compatível com o Railway
+version: '2.1'  # Versão mais compatível com Railway
 
 networks:
   aas_default:
-    #external: true
+    # external: true - comentado como sugerido
 
 services:
   aas-env:
@@ -17,14 +17,10 @@ services:
       - '3081:8081'
     restart: always
     depends_on:
-      aas-registry:
-        condition: service_healthy
-      sm-registry:
-        condition: service_healthy
-      mongo:
-        condition: service_healthy
-      mosquitto:
-        condition: service_healthy
+      - aas-registry
+      - sm-registry
+      - mongo
+      - mosquitto
     networks:
       - aas_default
 
@@ -39,8 +35,7 @@ services:
       - ./basyx/aas-registry.yml:/workspace/config/application.yml
     restart: always
     depends_on:
-      mongo:
-        condition: service_healthy
+      - mongo
     networks:
       - aas_default
 
@@ -55,8 +50,7 @@ services:
       - ./basyx/sm-registry.yml:/workspace/config/application.yml
     restart: always
     depends_on:
-      mongo:
-        condition: service_healthy
+      - mongo
     networks:
       - aas_default
 
@@ -71,8 +65,7 @@ services:
       - '3084:8081'
     restart: always
     depends_on:
-      mongo:
-        condition: service_healthy
+      - mongo
     networks:
       - aas_default
 
@@ -85,11 +78,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: mongoAdmin
       MONGO_INITDB_ROOT_PASSWORD: mongoPassword
     restart: always
-    healthcheck:
-      test: mongo
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    # Removida a healthcheck que também pode causar problemas
     networks:
       - aas_default
 
@@ -101,14 +90,7 @@ services:
     volumes:
       - ./mosquitto:/mosquitto
     restart: always
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - mosquitto_sub -p 1883 -t 'topic' -C 1 -E -i probe -W 3
-      interval: 5s
-      timeout: 10s
-      start_period: 1s
-      retries: 3
+    # Removida a healthcheck que também pode causar problemas
     networks:
       - aas_default
 
@@ -154,19 +136,19 @@ services:
     ports:
       - '3000:3000'
     environment:
-      AAS_REGISTRY_PATH: http://192.168.100.21:3082/shell-descriptors
-      SUBMODEL_REGISTRY_PATH: http://192.168.100.21:3083/submodel-descriptors
-      AAS_REPO_PATH: http://192.168.100.21:3081/shells
-      SUBMODEL_REPO_PATH: http://192.168.100.21:3081/submodels
-      CD_REPO_PATH: http://192.168.100.21:3081/concept-descriptions
-      AAS_DISCOVERY_PATH: http://192.168.100.21:3084/lookup/shells
+      # Usando nomes de serviços internos em vez de localhost
+      AAS_REGISTRY_PATH: http://aas-registry:8080/shell-descriptors
+      SUBMODEL_REGISTRY_PATH: http://sm-registry:8080/submodel-descriptors
+      AAS_REPO_PATH: http://aas-env:8081/shells
+      SUBMODEL_REPO_PATH: http://aas-env:8081/submodels
+      CD_REPO_PATH: http://aas-env:8081/concept-descriptions
+      AAS_DISCOVERY_PATH: http://aas-discovery:8081/lookup/shells
       INFLUXDB_TOKEN: >-
         S18VeAlq042B4naMX31oqIaSGmUmOLAC-DV3VIdkxDJuAhTXLTVFEchyTSmCcUAmB7Wu94KgExzV8gJaDjzR3Q==
-      DASHBOARD_SERVICE_PATH: http://192.168.100.21:3085/api/elements
+      DASHBOARD_SERVICE_PATH: http://dashboard-api:8085/api/elements
     restart: always
     depends_on:
-      aas-env:
-        condition: service_healthy
+      - aas-env
     networks:
       - aas_default
 
@@ -179,8 +161,6 @@ services:
       - ./basyx/aas-dashboard.yml:/application.yml
     restart: always
     depends_on:
-      mongo:
-        condition: service_healthy
+      - mongo
     networks:
       - aas_default
-
