@@ -1,6 +1,8 @@
+version: '3.8'  # Ou uma versão compatível com o Railway
+
 networks:
   aas_default:
-    external: true
+    #external: true
 
 services:
   aas-env:
