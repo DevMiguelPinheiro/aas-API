@@ -1,2 +1,3 @@
-[deploy]
-startCommand = "docker compose up --build"
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
