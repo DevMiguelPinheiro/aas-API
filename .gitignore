@@ -1,0 +1,69 @@
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Diretórios comuns de dependência
+/node_modules/
+bower_components/
+
+# Diretórios de build/output
+/dist/
+/build/
+/out/
+
+# Arquivos de ambiente e configuração sensíveis
+.env
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+.eggs/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# IDEs
+.idea/
+*.iml
+*.sw?
+
+# Sistemas de pacotes
+*.tgz
+*.tar.gz
+*.zip
+
+# Arquivos temporários
+*.tmp
+*.bak
+*.old
+*.orig
+
+# Testes e cobertura
+coverage/
+*.cover
+*.py,cover
+.hypothesis/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Docker
+*.pid
+docker-compose.override.yml
+
+# Outras ferramentas
+.mypy_cache/
+.pytest_cache/
