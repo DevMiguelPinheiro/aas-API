@@ -1,10 +1,11 @@
 annotated-types==0.7.0
 anyio==4.9.0
 basyx-python-sdk==1.2.0
-certifi==2025.4.26
+certifi==2024.2.2
 charset-normalizer==3.4.2
 click==8.1.8
 dnspython==2.7.0
+email-validator==2.1.0.post1
 fastapi==0.109.2
 gmqtt==0.7.0
 greenlet==3.2.1
@@ -16,18 +17,25 @@ motor==3.7.0
 pydantic==2.11.4
 pydantic_core==2.33.2
 pyecma376-2==1.0.1
-pymongo==4.6.1
+pymongo==4.12.1
 python-dateutil==2.9.0.post0
-requests==2.32.3
+python-dotenv==1.0.1
+python-multipart==0.0.9
+requests==2.31.0
 six==1.17.0
 sniffio==1.3.1
 SQLAlchemy==2.0.40
-starlette==0.46.2
+starlette==0.36.3
 typing-inspection==0.4.0
 typing_extensions==4.13.2
 urllib3==2.4.0
-uvicorn==0.27.1
+uvicorn==0.34.2
 Werkzeug==3.1.3
-python-multipart==0.0.9
-python-dotenv==1.0.1
-paho-mqtt==1.6.1
+# Dependências adicionais
+python-jose[cryptography]==3.3.0  # Para autenticação JWT
+passlib[bcrypt]==1.7.4  # Para hash de senhas
+python-multipart==0.0.9  # Para upload de arquivos
+aiofiles==23.2.1  # Para operações assíncronas com arquivos
+pytest==8.0.0  # Para testes
+pytest-asyncio==0.23.5  # Para testes assíncronos
+httpx==0.26.0  # Para testes de API
