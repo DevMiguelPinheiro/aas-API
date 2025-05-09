@@ -36,6 +36,19 @@ async def update_property(property_id_short: str, update: PropertyUpdate):
     """
     return await aas_service.update_property(property_id_short, str(update.value))
 
+@router.get("/aas/submodels/{submodel_id_short}")
+async def get_submodel_by_id_short(submodel_id_short: str):
+    """
+    Busca um submodelo específico pelo seu idShort.
+    
+    Args:
+        submodel_id_short: ID do submodelo a ser buscado
+    """
+    submodel = aas_service.get_submodel_by_id_short(submodel_id_short)
+    if not submodel:
+        raise HTTPException(status_code=404, detail=f"Submodelo com idShort '{submodel_id_short}' não encontrado")
+    return submodel
+
 @router.get("/aas/debug/structure")
 async def debug_structure():
     """Rota temporária para debug - mostra a estrutura do AAS"""

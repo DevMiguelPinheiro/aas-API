@@ -242,3 +242,19 @@ def debug_aas_structure():
                 for sub_element in element.value:
                     if isinstance(sub_element, Property):
                         print(f"        Property: {sub_element.id_short} = {sub_element.value} (tipo: {sub_element.value_type})")
+
+def get_submodel_by_id_short(submodel_id_short: str):
+    """
+    Busca um submodelo específico pelo seu idShort.
+    
+    Args:
+        submodel_id_short: ID do submodelo a ser buscado
+        
+    Returns:
+        O submodelo encontrado ou None se não encontrado
+    """
+    aas = get_aas()
+    for submodel in aas.data_elements:
+        if submodel.id_short == submodel_id_short:
+            return submodel
+    return None
