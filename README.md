@@ -142,3 +142,274 @@ aas-API/
 3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
 4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
+
+# AAS API
+
+API para gerenciamento de Asset Administration Shell (AAS) com suporte a MQTT para atualizações em tempo real.
+
+## 🚀 Instalação
+
+```bash
+# Clone o repositório
+git clone https://github.com/seu-usuario/aas-API.git
+
+# Entre no diretório
+cd aas-API
+
+# Instale as dependências
+pip install -r requirements.txt
+```
+
+## ⚙️ Configuração
+
+1. Configure as variáveis de ambiente no arquivo `.env`:
+```env
+MQTT_BROKER=localhost
+MQTT_PORT=1883
+MQTT_TOPIC=aas/updates
+```
+
+2. Inicie o servidor:
+```bash
+uvicorn src.api.main:app --reload
+```
+
+## 📚 Documentação da API
+
+### AAS Endpoints
+
+#### 1. Obter AAS Completo
+```http
+GET /aas
+```
+
+**Resposta:**
+```json
+{
+    "id": "AAS_1",
+    "id_short": "AAS_1",
+    "semantic_id": "https://example.com/aas",
+    "kind": "Instance",
+    "data_elements": [
+        {
+            "id": "Temperatura_1",
+            "id_short": "Temperatura",
+            "semantic_id": "https://example.com/temperatura",
+            "kind": "Instance",
+            "submodel_elements": [
+                {
+                    "id_short": "CurrentTemperature",
+                    "value": "25.5",
+                    "value_type": "float"
+                },
+                {
+                    "id_short": "TemperatureHistory",
+                    "value": [
+                        {
+                            "id_short": "Timestamp",
+                            "value": "2024-02-20T10:00:00",
+                            "value_type": "string"
+                        },
+                        {
+                            "id_short": "Value",
+                            "value": "25.5",
+                            "value_type": "float"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
+```
+
+#### 2. Criar/Atualizar AAS
+```http
+POST /aas
+```
+
+**Requisição:**
+```json
+{
+    "id": "AAS_1",
+    "id_short": "AAS_1",
+    "semantic_id": "https://example.com/aas",
+    "kind": "Instance",
+    "data_elements": [
+        {
+            "id": "Temperatura_1",
+            "id_short": "Temperatura",
+            "semantic_id": "https://example.com/temperatura",
+            "kind": "Instance",
+            "submodel_elements": [
+                {
+                    "id_short": "CurrentTemperature",
+                    "value": "25.5",
+                    "value_type": "float"
+                }
+            ]
+        }
+    ]
+}
+```
+
+### Propriedades Endpoints
+
+#### 1. Obter Propriedades Variáveis
+```http
+GET /aas/properties/variable
+```
+
+**Resposta:**
+```json
+[
+    {
+        "id_short": "CurrentTemperature",
+        "value": "25.5",
+        "value_type": "float"
+    }
+]
+```
+
+#### 2. Obter Propriedades Constantes
+```http
+GET /aas/properties/constant
+```
+
+**Resposta:**
+```json
+[
+    {
+        "id_short": "MaxTemperature",
+        "value": "100.0",
+        "value_type": "float"
+    }
+]
+```
+
+#### 3. Atualizar Propriedade
+```http
+PUT /aas/properties/{property_id_short}
+```
+
+**Requisição:**
+```json
+{
+    "value": "26.5"
+}
+```
+
+**Resposta:**
+```json
+{
+    "id_short": "CurrentTemperature",
+    "value": "26.5",
+    "value_type": "float"
+}
+```
+
+### Submodelos Endpoints
+
+#### 1. Obter Submodelo por ID
+```http
+GET /aas/submodels/{submodel_id_short}
+```
+
+**Resposta:**
+```json
+{
+    "id": "Temperatura_1",
+    "id_short": "Temperatura",
+    "semantic_id": "https://example.com/temperatura",
+    "kind": "Instance",
+    "submodel_elements": [
+        {
+            "id_short": "CurrentTemperature",
+            "value": "25.5",
+            "value_type": "float"
+        },
+        {
+            "id_short": "TemperatureHistory",
+            "value": [
+                {
+                    "id_short": "Timestamp",
+                    "value": "2024-02-20T10:00:00",
+                    "value_type": "string"
+                },
+                {
+                    "id_short": "Value",
+                    "value": "25.5",
+                    "value_type": "float"
+                }
+            ]
+        }
+    ]
+}
+```
+
+### Temperatura Endpoints
+
+#### 1. Obter Histórico de Temperaturas
+```http
+GET /temperatures
+```
+
+**Resposta:**
+```json
+[
+    {
+        "timestamp": "2024-02-20T10:00:00",
+        "value": 25.5
+    },
+    {
+        "timestamp": "2024-02-20T10:01:00",
+        "value": 25.7
+    }
+]
+```
+
+### Debug Endpoints
+
+#### 1. Visualizar Estrutura do AAS
+```http
+GET /aas/debug/structure
+```
+
+**Resposta:**
+```json
+{
+    "message": "Estrutura do AAS impressa no console"
+}
+```
+
+#### 2. Visualizar Estrutura Detalhada do AAS
+```http
+GET /aas/debug/detailed
+```
+
+**Resposta:**
+```json
+{
+    "message": "Estrutura detalhada do AAS impressa no console"
+}
+```
+
+## 🔄 MQTT
+
+A API utiliza MQTT para publicar atualizações em tempo real. As mensagens são publicadas no tópico configurado (padrão: `aas/updates`) no seguinte formato:
+
+```json
+{
+    "property_id_short": "CurrentTemperature",
+    "value": "25.5",
+    "timestamp": "2024-02-20T10:00:00"
+}
+```
+
+## 📝 Notas
+
+- Todas as rotas retornam respostas em formato JSON
+- Valores de propriedades podem ser strings, números ou booleanos
+- Timestamps são formatados em ISO 8601
+- A API inclui validação de tipos e valores
+- Todas as rotas são documentadas no Swagger UI (`/docs`)
