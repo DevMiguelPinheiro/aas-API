@@ -23,8 +23,8 @@ app.include_router(temperature.router)
 
 @app.on_event("startup")
 async def startup():
-    # Initialize AAS
     try:
+        # Initialize AAS
         aas_instance = aas_service.initialize_aas()
         logger.info(f"✅ AAS inicializado com sucesso! ID: {aas_instance.id}")
         logger.info("🚀 AAS API inicializada com sucesso!")
