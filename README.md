@@ -2,6 +2,192 @@
 
 Um backend usado para servir e historizar metamodelos de AAS seguindo a estrutura utilizada por arquivos .aasx encontrada em [Metamodel v3](https://industrialdigitaltwin.org/wp-content/uploads/2024/06/IDTA-01001-3-0-1_SpecificationAssetAdministrationShell_Part1_Metamodel.pdf).
 
+## 🏗️ Arquitetura do Sistema
+
+### Visão Geral
+
+O sistema é construído seguindo uma arquitetura em camadas, com separação clara de responsabilidades e comunicação assíncrona via MQTT para atualizações em tempo real.
+
+```mermaid
+graph TB
+    Client[Cliente HTTP] --> API[API Layer]
+    IoT[Dispositivos IoT] --> MQTT[MQTT Broker]
+    MQTT --> API
+    API --> Service[Service Layer]
+    Service --> Repository[Repository Layer]
+    Repository --> MongoDB[(MongoDB)]
+    Service --> Cache[(Cache)]
+```
+
+### Componentes Principais
+
+#### 1. API Layer (`src/api/`)
+- **Routes**: Endpoints HTTP REST
+  - `aas.py`: Rotas para gerenciamento do AAS
+  - `temperatures.py`: Rotas para histórico de temperaturas
+- **Services**: Lógica de negócio
+  - `aas_service.py`: Serviços para manipulação do AAS
+  - `mqtt_service.py`: Gerenciamento de comunicação MQTT
+- **Models**: Schemas Pydantic
+  - `aas.py`: Modelos de dados do AAS
+  - `temperature.py`: Modelos para dados de temperatura
+
+#### 2. Service Layer (`src/services/`)
+- **AASService**: Gerenciamento do Asset Administration Shell
+  - Criação e atualização de submodelos
+  - Manipulação de propriedades
+  - Validação de dados
+- **MQTTService**: Comunicação em tempo real
+  - Publicação de atualizações
+  - Subscrição a tópicos
+  - Callbacks para eventos
+
+#### 3. Repository Layer (`src/repositories/`)
+- **MongoDBRepository**: Persistência de dados
+  - Armazenamento do AAS
+  - Histórico de temperaturas
+  - Cache de propriedades
+
+#### 4. Models (`src/models/`)
+```mermaid
+classDiagram
+    class BaseElement {
+        +str id_short
+        +Optional[DataElementCategory] category
+        +Optional[str] description
+    }
+
+    class Property {
+        +Union[str, float, int] value
+        +ValueType value_type
+        +validate_value_type()
+    }
+
+    class SubmodelElementCollection {
+        +List[Union[Property, SubmodelElementCollection]] value
+    }
+
+    class Submodel {
+        +str id
+        +List[Union[Property, SubmodelElementCollection]] submodel_elements
+    }
+
+    class AssetAdministrationShell {
+        +str id
+        +str id_short
+        +List[Submodel] data_elements
+    }
+
+    BaseElement <|-- Property
+    BaseElement <|-- SubmodelElementCollection
+    BaseElement <|-- Submodel
+    SubmodelElementCollection o-- Property
+    SubmodelElementCollection o-- SubmodelElementCollection
+    Submodel o-- Property
+    Submodel o-- SubmodelElementCollection
+    AssetAdministrationShell o-- Submodel
+```
+
+### Fluxo de Dados
+
+1. **Atualização de Propriedades**
+```mermaid
+sequenceDiagram
+    participant IoT as Dispositivo IoT
+    participant MQTT as MQTT Broker
+    participant API as API Layer
+    participant Service as Service Layer
+    participant DB as MongoDB
+
+    IoT->>MQTT: Publica atualização
+    MQTT->>API: Notifica mudança
+    API->>Service: Processa atualização
+    Service->>DB: Persiste dados
+    Service->>API: Retorna resultado
+    API->>MQTT: Publica confirmação
+    MQTT->>IoT: Notifica sucesso
+```
+
+2. **Consulta de Dados**
+```mermaid
+sequenceDiagram
+    participant Client as Cliente HTTP
+    participant API as API Layer
+    participant Service as Service Layer
+    participant Cache as Cache
+    participant DB as MongoDB
+
+    Client->>API: Requisição HTTP
+    API->>Service: Processa requisição
+    Service->>Cache: Verifica cache
+    alt Cache Hit
+        Cache->>Service: Retorna dados
+    else Cache Miss
+        Service->>DB: Consulta dados
+        DB->>Service: Retorna dados
+        Service->>Cache: Atualiza cache
+    end
+    Service->>API: Retorna resultado
+    API->>Client: Resposta HTTP
+```
+
+### Comunicação MQTT
+
+O sistema utiliza MQTT para comunicação em tempo real com dispositivos IoT:
+
+```mermaid
+graph LR
+    subgraph "Tópicos MQTT"
+        T1[aas/updates]
+        T2[aas/temperature]
+        T3[aas/feeding]
+    end
+    
+    subgraph "Dispositivos IoT"
+        D1[Sensor de Temperatura]
+        D2[Controlador de Alimentação]
+    end
+    
+    D1 --> T2
+    D2 --> T3
+    T1 --> D1
+    T1 --> D2
+```
+
+### Estratégia de Cache
+
+O sistema implementa uma estratégia de cache em múltiplas camadas:
+
+1. **Cache de Propriedades**
+   - Armazena valores recentes
+   - TTL configurável
+   - Invalidação automática
+
+2. **Cache de Submodelos**
+   - Estrutura completa
+   - Atualização incremental
+   - Persistência em memória
+
+3. **Cache de Histórico**
+   - Dados temporais
+   - Agregação por período
+   - Limpeza automática
+
+### Segurança
+
+- Autenticação via JWT
+- Validação de tipos com Pydantic
+- Sanitização de inputs
+- Rate limiting
+- CORS configurável
+
+### Monitoramento
+
+- Logs estruturados
+- Métricas de performance
+- Health checks
+- Alertas automáticos
+
 ## Diagrama de Classes
 
 ```mermaid
