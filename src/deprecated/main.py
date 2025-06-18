@@ -129,5 +129,5 @@ def submodel_converter(sm: model.Submodel) -> Submodel:
     return submodel
 
 
-aas_metamodel_converter("./aas-static/FishTankAAS.aasx")
+aas_metamodel_converter("./aas-static/YOUR_AAS_HERE.aasx")
 

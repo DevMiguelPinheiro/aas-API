@@ -104,7 +104,7 @@ def create_aas() -> AssetAdministrationShell:
     """
     Creates and returns an AAS instance from the AASX file
     """
-    aas = aas_metamodel_converter("./aas-static/FishTankAAS.aasx")
+    aas = aas_metamodel_converter("./aas-static/YOUR_AAS_HERE.aasx")
     print(f"AAS created successfully with ID: {aas.id}")
     return aas
 

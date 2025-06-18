@@ -14,7 +14,7 @@ class MQTTService:
     _connected: bool = False
     _on_temperature_message: Optional[Callable[[float], Any]] = None
 
-    TOPIC_TEMPERATURE = 'iTamba/temperature'
+    TOPIC_TEMPERATURE = '#YOUR_TOPIC'
     MQTT_BROKER = 'broker.hivemq.com'
     MQTT_PORT = 1883
 
