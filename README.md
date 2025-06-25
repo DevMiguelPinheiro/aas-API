@@ -337,7 +337,7 @@ API para gerenciamento de Asset Administration Shell (AAS) com suporte a MQTT pa
 
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-usuario/aas-API.git
+git clone https://github.com/DevMiguelPinheiro/aas-API.git
 
 # Entre no diretório
 cd aas-API
